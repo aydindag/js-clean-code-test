@@ -2,28 +2,30 @@ import { users } from "../data/users.js"
 import DataError from "../models/dataError.js"
 import { MongoLogger } from "../crossCuttingConcerns/mongoLogger.js"
 export default class UserService {
+    static  customer= "customer";
+    static  employee= "employee";
+
     constructor() {
-        this.err = new Array()
-        this.employees =  new Array()
-        this.customers = new Array();
+        this.err = []
+        this.employees =  []
+        this.customers = [];
         this.loggerService = new MongoLogger();
+
     }
 
     load() {
-        var wrong = false;
+        let wrong = false;
         for (let i=0, len=users.length; i< len; i++) {
-            if (users[i].type == "customer"){
+            if (UserService.customer === users[i].type){
                 if (!this.customercheck(users[i])) {
                     this.customers.push(users[i])
                 }
-            } 
-            
-            else if (users[i].type == "employee"){
+            } else if (UserService.employee === users[i].type){
                 if (!this.employeeCheck(users[i])) {
                     this.employees.push(users[i])
                 }
             } else {
-                wrong = 1
+                wrong = true
             }
 
             if (wrong)
@@ -32,60 +34,62 @@ export default class UserService {
     }
 
     customercheck(user) {
-        let fields = "id firstName lastName age city".split(" ")
+        let fields = ["id","firstName", "lastName","age","city"]
+        let errcheck = false
         for (const f of fields) {
-            if (!err) var err = false
+            if (!err)  errcheck = false
             if (!user[f]) {
-                err = 1
+                errcheck = true
                 this.err.push(
                     new DataError(`Validation problem. ${f} is required`, user))
             }
         }
 
         if (Number.isNaN(+(+user.age))) {
-            err = 1
-            
+            errcheck = true
+
             this.err.push(new DataError(`Validation problem. ${user.age} is not a number`, user))
-            
+
         }
 
-        return err
+        return errcheck
     }
 
     employeeCheck(user) {
-        let fields = "id firstName lastName age city salary".split(" ")
+        let fields = ["id","firstName", "lastName","age","city","salary"]
+        let errcheck = false
         for (const f of fields) {
-            if (!err) var err = false
+            if (!err)  errcheck = false
             if (!user[f]) {
-            
+
                 this.err.push(
                     new DataError(`Validation problem. ${f} is required`, user))
             }
         }
 
         if (Number.isNaN(+(user.age))) {
-            err = true
+            errcheck = true
             this.err.push(new DataError(`Validation problem. ${user.age} is not a number`, user))
         }
 
-        
-        return err
+
+        return errcheck
     }
 
     add(user) {
-        if(user.type=="customer"){
+        if(UserService.customer === user.type){
             if (!this.customercheck(user)) {
                 this.customers.push(user)
             }
         }
-        
-        else if(user.type=="employee"){
+
+        else if(UserService.employee === user.type){
             if (!this.employeeCheck(user)) {
-                
+
                 this.employees.push(user)
             }
         }
-        
+
         else{
             this.err.push(
                 new DataError("This user can not be added", user))
@@ -100,24 +104,24 @@ export default class UserService {
 
     getCustomer(id) {
         for (let i = 0, len = this.customers.length; i < len; ++i) {
-          if (this.customers[i].id == id) {
-            
+          if (this.customers[i].id === id) {
+
             return this.customers[i];
 
           }
         }
-        
+
         return null;
     }
 
     customersSorted(){
         return this.customers.sort((customer1,customer2)=>{
-            if(customer2 != null && customer1.userFirstName>customer2.userFirstName){ return 1; }
-            else if(customer2 != null && customer1.userFirstName==customer2.userFirstName){ return 0; }
-            
-            else{ 
+            if(customer2 != null && customer1.firstName>customer2.firstName){ return 1; }
+            else if(customer2 != null && customer1.firstName===customer2.firstName){ return 0; }
+
+            else{
                 return -1
             }
         })
-    } 
+    }
 }

@@ -1,10 +1,8 @@
-export default class Employee{
+import {User} from "./user";
+
+export default class Employee extends User{
     constructor(id, firstName, lastName, city,age, employeeSalary) {
-        this.userId = id
-        this.userFirstName = firstName;
-        this.userLastName = lastName
-        this.userCity = city;
-        this.userAge = age
+        super(id, firstName, lastName, city,age );
         this.salary = employeeSalary
     }
 }

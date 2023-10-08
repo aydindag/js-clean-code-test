@@ -4,7 +4,7 @@ import UserService from "../services/userService.js"
 
 console.log("User component yüklendi")
 
-var service = new UserService()
+const service = new UserService()
 
 var user1 = new User(1,"Engin","Demiroğ","Ankara")
 var user2 = new User(2,"Ahmet","Çetinkaya","Antalya")
